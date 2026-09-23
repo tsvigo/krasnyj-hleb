@@ -1,0 +1,15 @@
+# Тяжёлые бинарники исходного архива (есть локально в source_archive/, в git не нужны)
+source_archive/*.zip
+source_archive/*.epub
+source_archive/*_text.pdf
+2015.52429.Red-Bread_text.pdf
+
+# Страховочные копии рабочих файлов (история ведётся самим git)
+backup/
+
+# Временные файлы редакторов и ОС
+*~
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
