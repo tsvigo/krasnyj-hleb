@@ -1,0 +1,119 @@
+{
+  "chapters": [
+    {
+      "num": 15,
+      "roman": "XV",
+      "title": "THE LANDLORD HERDSMAN",
+      "parts": 1
+    },
+    {
+      "num": 1,
+      "roman": "I",
+      "title": "NADYA’S LETTER",
+      "parts": 1
+    },
+    {
+      "num": 2,
+      "roman": "II",
+      "title": "THE GATHERING OF",
+      "parts": 3
+    },
+    {
+      "num": 3,
+      "roman": "III",
+      "title": "THE SPIRIT OF SUNDAY",
+      "parts": 2
+    },
+    {
+      "num": 4,
+      "roman": "IV",
+      "title": "THE COMING OF THE STORM",
+      "parts": 1
+    },
+    {
+      "num": 5,
+      "roman": "V",
+      "title": "MOSCOW MARCHES ON",
+      "parts": 2
+    },
+    {
+      "num": 6,
+      "roman": "VI",
+      "title": "BEYOND THE PALE",
+      "parts": 2
+    },
+    {
+      "num": 7,
+      "roman": "VII",
+      "title": "THE DAILY ORDEAL",
+      "parts": 3
+    },
+    {
+      "num": 8,
+      "roman": "VIII",
+      "title": "‘THE RETURN OF THE NATIVE’",
+      "parts": 2
+    },
+    {
+      "num": 9,
+      "roman": "IX",
+      "title": "THE VOICE OF THE MASS",
+      "parts": 3
+    },
+    {
+      "num": 10,
+      "roman": "X",
+      "title": "THE WHITE WEDDING",
+      "parts": 2
+    },
+    {
+      "num": 11,
+      "roman": "XI",
+      "title": "THE KOLKHOZ",
+      "parts": 2
+    },
+    {
+      "num": 12,
+      "roman": "XII",
+      "title": "THE NEW AND THE OLD",
+      "parts": 2
+    },
+    {
+      "num": 13,
+      "roman": "XIII",
+      "title": "THE KAOLACK",
+      "parts": 2
+    },
+    {
+      "num": 14,
+      "roman": "XIV",
+      "title": "THE PUZZLED LITTLE FATHER",
+      "parts": 3
+    },
+    {
+      "num": 16,
+      "roman": "XVI",
+      "title": "A NEW GIRL",
+      "parts": 2
+    },
+    {
+      "num": 17,
+      "roman": "XVII",
+      "title": "Gypsy ROSA",
+      "parts": 2
+    },
+    {
+      "num": 18,
+      "roman": "XVIII",
+      "title": "THE FAREWELL VISIT",
+      "parts": 2
+    },
+    {
+      "num": 19,
+      "roman": "XIX",
+      "title": "RED BREAD",
+      "parts": 2
+    }
+  ],
+  "chunk_words": 3500
+}
