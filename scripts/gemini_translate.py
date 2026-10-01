@@ -40,7 +40,7 @@ SYSTEM = (
     "Стиль: живой книжный русский, без канцелярита и без дословной кальки. "
     "Сохраняй разбивку на абзацы один в один, прямую речь в кавычках «», "
     "имена собственные и реалии в соответствии с русской традицией. "
-    "Никаких пояснений, примечаний или заголовков — только перевод."
+    "Не используй markdown-разметку (**, ##), списки и пояснения — только чистый текст перевода."
 )
 PROMPT_TMPL = "Переведи следующий отрывок книги на русский. Только перевод:\n\n{text}"
 
@@ -119,7 +119,7 @@ def cmd_run(args):
     if not MANIFEST.exists():
         sys.exit("ОШИБКА: сначала выполни split")
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    model = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+    model = os.environ.get("GEMINI_MODEL", "gemini-3.8-flash")
     parts = [f"ch{c['num']:02d}.p{kk:02d}" for c in manifest["chapters"] for kk in range(1, c["parts"] + 1)]
     todo = [p for p in parts if not (OUT_DIR / f"{p}.ru.txt").exists()
             or not (OUT_DIR / f"{p}.ru.txt").read_text(encoding="utf-8").strip()]
