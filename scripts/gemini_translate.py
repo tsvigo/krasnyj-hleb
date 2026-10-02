@@ -193,7 +193,7 @@ def cmd_merge(_args):
     out = []
     missing = []
     for c in chapters:
-        head = f"ГЛАВА {c['roman']}\n\n{c['title']}\n"
+        head = f"ГЛАВА {c['roman']}\n"
         out.append(head)
         for kk in range(1, c["parts"] + 1):
             f = OUT_DIR / f"ch{c['num']:02d}.p{kk:02d}.ru.txt"
