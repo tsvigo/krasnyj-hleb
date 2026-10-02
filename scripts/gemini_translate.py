@@ -188,9 +188,11 @@ def cmd_merge(_args):
     if not MANIFEST.exists():
         sys.exit("ОШИБКА: сначала выполни split")
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    # Канонический порядок чтения I..XIX (в OCR-файле XV физически стоит первой)
+    chapters = sorted(manifest["chapters"], key=lambda c: c["num"])
     out = []
     missing = []
-    for c in manifest["chapters"]:
+    for c in chapters:
         head = f"ГЛАВА {c['roman']}\n\n{c['title']}\n"
         out.append(head)
         for kk in range(1, c["parts"] + 1):
