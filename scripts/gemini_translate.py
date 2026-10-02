@@ -46,7 +46,8 @@ PROMPT_TMPL = "Переведи следующий отрывок книги н�
 
 CHUNK_WORDS = 3500          # целевой размер чанка в словах
 SLEEP_OK = 7.0              # пауза между запросами (~8.5 RPM < лимита 10 RPM)
-MAX_RETRIES = 6
+MAX_RETRIES = 8
+MAX_ROUNDS = 6
 
 
 def _header_hits(lines):
@@ -119,23 +120,30 @@ def cmd_run(args):
     if not MANIFEST.exists():
         sys.exit("ОШИБКА: сначала выполни split")
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    model = os.environ.get("GEMINI_MODEL", "gemini-3.8-flash")
+    # Ротация моделей по ретраям: пробуем лучшую, затем гарантированно рабочую
+    models = [m.strip() for m in os.environ.get(
+        "GEMINI_MODELS",
+        "gemini-3.8-flash,gemini-3.1-flash-lite,gemini-3.7-flash,gemini-3.5-flash",
+    ).split(",") if m.strip()]
+    print(f"Модели по ротации: {', '.join(models)}")
     parts = [f"ch{c['num']:02d}.p{kk:02d}" for c in manifest["chapters"] for kk in range(1, c["parts"] + 1)]
     todo = [p for p in parts if not (OUT_DIR / f"{p}.ru.txt").exists()
             or not (OUT_DIR / f"{p}.ru.txt").read_text(encoding="utf-8").strip()]
     done = len(parts) - len(todo)
     if args.limit:
         todo = todo[:args.limit]
-    print(f"Всего {len(parts)}, готово {done}, к работе {len(todo)}, модель {model}")
+    print(f"Всего {len(parts)}, готово {done}, к работе {len(todo)}")
     if not todo:
         print("Переводить нечего — выполни merge")
         return
     client = _load_client()
     from google.genai import errors
-    for i, stem in enumerate(todo, 1):
+
+    def try_chunk(stem):
         text = (PART_DIR / f"{stem}.en.txt").read_text(encoding="utf-8")
         prompt = PROMPT_TMPL.format(text=text)
         for attempt in range(1, MAX_RETRIES + 1):
+            model = models[(attempt - 1) % len(models)]
             try:
                 resp = client.models.generate_content(
                     model=model, contents=prompt,
@@ -144,19 +152,35 @@ def cmd_run(args):
                 ru = (resp.text or "").strip()
                 if not ru:
                     raise RuntimeError("пустой ответ")
-                break
+                print(f"  [{stem}] {model} — успех")
+                tmp = OUT_DIR / f"{stem}.ru.txt.tmp"
+                tmp.write_text(ru + "\n", encoding="utf-8")
+                tmp.replace(OUT_DIR / f"{stem}.ru.txt")
+                print(f"  [{stem}]: {len(ru.split())} слов")
+                return True
             except (errors.APIError, RuntimeError, ConnectionError) as e:
                 wait = min(15 * attempt, 120)
-                print(f"  [{stem}] попытка {attempt}/{MAX_RETRIES}: {type(e).__name__}: {e}; жду {wait}с")
+                print(f"  [{stem}] {model}, попытка {attempt}/{MAX_RETRIES}: {type(e).__name__}: {str(e)[:100]}; жду {wait}с")
                 time.sleep(wait)
-        else:
-            sys.exit(f"ОШИБКА: {stem} не переведён после {MAX_RETRIES} попыток (файлы чанков сохранены, повтори run)")
-        tmp = OUT_DIR / f"{stem}.ru.txt.tmp"
-        tmp.write_text(ru + "\n", encoding="utf-8")
-        tmp.replace(OUT_DIR / f"{stem}.ru.txt")
-        print(f"[{i}/{len(todo)}] {stem}: {len(ru.split())} слов")
-        time.sleep(SLEEP_OK)
+        return False
+
+    # Многоходовка: неудачные чанки не убивают процесс, идут в следующий круг
+    pending = todo
+    for rnd in range(1, MAX_ROUNDS + 1):
+        if rnd > 1:
+            print(f"=== Раунд {rnd}: догоняю {len(pending)} чанков, пауза 60с ===", flush=True)
+            time.sleep(60)
+        failed = []
+        for stem in pending:
+            if not try_chunk(stem):
+                failed.append(stem)
+            time.sleep(SLEEP_OK)
+        pending = failed
+        if not pending:
+            break
     left = sum(1 for p in parts if not (OUT_DIR / f"{p}.ru.txt").exists())
+    if pending:
+        sys.exit(f"ОШИБКА: {len(pending)} чанков не переведено за {MAX_ROUNDS} раундов: {pending[:5]}... (повтори run)")
     print(f"Готово. Осталось чанков: {left}" + (" — повтори run" if left else " — выполни merge"))
 
 
